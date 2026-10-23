@@ -17,35 +17,6 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col items-center justify-center p-4">
 
-    <!-- MODAL VERIFIKASI TELEGRAM -->
-    <div id="verifyModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4">
-        <div class="glass w-full max-w-md p-6 rounded-2xl glow-blue text-center">
-            <div class="w-16 h-16 bg-sky-500/20 text-sky-400 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
-                <i class="fa-brands fa-telegram"></i>
-            </div>
-            <h2 class="text-2xl font-bold mb-2 text-sky-400">Verifikasi Keanggotaan</h2>
-            <p class="text-sm text-slate-300 mb-5">Anda wajib bergabung di grup/channel resmi kami sebelum mengakses panel kontrol.</p>
-
-    <!-- Direct Link ke Telegram Channel Baru -->
-    <a href="https://t.me/inpormationpikri" target="_blank" class="w-full mb-4 inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 border border-sky-500/50 text-sky-400 font-semibold py-3 rounded-xl transition shadow-md">
-        <i class="fa-solid fa-paper-plane"></i> Gabung @inpormationpikri
-    </a>
-            <div class="relative flex py-2 items-center mb-3">
-                <div class="flex-grow border-t border-slate-800"></div>
-                <span class="flex-shrink mx-4 text-slate-500 text-xs uppercase font-semibold">Sudah Join?</span>
-                <div class="flex-grow border-t border-slate-800"></div>
-            </div>
-
-            <!-- Input Telegram ID -->
-            <input type="text" id="telegramIdInput" placeholder="Masukkan ID Telegram Anda (Contoh: 123456789)" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 mb-4 text-center text-slate-100 focus:outline-none focus:border-sky-500 font-mono text-sm">
-            
-            <button id="verifyBtn" onclick="verifyUser()" class="w-full bg-gradient-to-r from-blue-600 to-sky-500 hover:from-blue-500 hover:to-sky-400 text-white font-semibold py-3 rounded-xl transition shadow-lg shadow-sky-500/30">
-                Verifikasi & Masuk
-            </button>
-            <p id="verifyError" class="text-red-400 text-xs mt-3 hidden font-medium"></p>
-        </div>
-    </div>
-
     <!-- MAIN PANEL KONTROL -->
     <div id="mainPanel" class="w-full max-w-6xl glass rounded-3xl glow-blue p-6 md:p-8 hidden">
         <!-- Header Panel -->
