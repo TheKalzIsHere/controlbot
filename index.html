@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telegram Bot Kall parker Control Panel</title>
+    <title>Telegram Bot Kall Parker Control Panel</title>
     <!-- Tailwind CSS & FontAwesome -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -18,12 +18,12 @@
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col items-center justify-center p-4">
 
     <!-- MAIN PANEL KONTROL -->
-    <div id="mainPanel" class="w-full max-w-6xl glass rounded-3xl glow-blue p-6 md:p-8 hidden">
+    <div id="mainPanel" class="w-full max-w-6xl glass rounded-3xl glow-blue p-6 md:p-8">
         <!-- Header Panel -->
         <div class="flex flex-col md:flex-row justify-between items-center border-b border-slate-800 pb-6 mb-6 gap-4">
             <div>
                 <h1 class="text-2xl font-bold bg-gradient-to-r from-sky-400 to-blue-500 bg-clip-text text-transparent">
-                    <i class="fa-solid fa-robot mr-2"></i> Telegram Bot Kall parker Control
+                    <i class="fa-solid fa-robot mr-2"></i> Telegram Bot Kall Parker Control
                 </h1>
                 <p class="text-xs text-slate-400 mt-1">Status: <span id="connectionStatus" class="text-amber-400">Belum Terhubung</span></p>
             </div>
@@ -106,7 +106,7 @@
                 <button onclick="clearConsole()" class="text-xs text-slate-400 hover:text-slate-200">Bersihkan Log</button>
             </div>
             <div id="consoleLog" class="bg-slate-950 rounded-xl p-3 h-36 overflow-y-auto console-text text-xs text-emerald-400 space-y-1">
-                <div>[SYSTEM] Panel kontrol siap. Masukkan ID Telegram untuk verifikasi...</div>
+                <div>[SYSTEM] Panel kontrol siap. Hubungkan bot untuk mulai.</div>
             </div>
         </div>
     </div>
@@ -122,52 +122,6 @@
             
             consoleBox.innerHTML += `<div class="${colorClass}">[${time}] ${message}</div>`;
             consoleBox.scrollTop = consoleBox.scrollHeight;
-        }
-
-        // Verifikasi User via Backend Serverless Vercel
-        async function verifyUser() {
-            const tgId = document.getElementById('telegramIdInput').value.trim();
-            const errorEl = document.getElementById('verifyError');
-            const verifyBtn = document.getElementById('verifyBtn');
-
-            if (!tgId || isNaN(tgId)) {
-                errorEl.textContent = "Masukkan ID Telegram yang valid!";
-                errorEl.classList.remove('hidden');
-                return;
-            }
-
-            errorEl.classList.add('hidden');
-            verifyBtn.textContent = "Memeriksa keanggotaan...";
-            verifyBtn.disabled = true;
-            logToConsole(`Mengirim permintaan verifikasi untuk ID: ${tgId}...`);
-
-            try {
-                const response = await fetch('/api/verify', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ telegramId: tgId })
-                });
-
-                const result = await response.json();
-
-                if (result.success) {
-                    logToConsole(`Verifikasi SUKSES! Status keanggotaan: ${result.status}`);
-                    document.getElementById('verifyModal').classList.add('hidden');
-                    document.getElementById('mainPanel').classList.remove('hidden');
-                } else {
-                    errorEl.textContent = result.message || "Akses Ditolak! Anda belum bergabung di @infobotpikri.";
-                    errorEl.classList.remove('hidden');
-                    logToConsole(`Verifikasi DITOLAK: ${result.message}`, "error");
-                    verifyBtn.textContent = "Verifikasi & Masuk";
-                    verifyBtn.disabled = false;
-                }
-            } catch (err) {
-                errorEl.textContent = "Gagal terhubung ke server verifikasi.";
-                errorEl.classList.remove('hidden');
-                logToConsole("Error koneksi ke backend verifikasi.", "error");
-                verifyBtn.textContent = "Verifikasi & Masuk";
-                verifyBtn.disabled = false;
-            }
         }
 
         // Hubungkan Bot Target
