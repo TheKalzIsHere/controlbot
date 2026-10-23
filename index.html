@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Bot Luxury Master Control Panel</title>
+    <!-- Tailwind CSS & FontAwesome -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .glass { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(16px); border: 1px solid rgba(56, 189, 248, 0.25); }
+        .glow-blue { box-shadow: 0 0 30px rgba(14, 165, 233, 0.25); }
+        .console-text { font-family: 'Courier New', Courier, monospace; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col items-center justify-center p-4">
+
+    <!-- MODAL VERIFIKASI TELEGRAM -->
+    <div id="verifyModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4">
+        <div class="glass w-full max-w-md p-6 rounded-2xl glow-blue text-center">
+            <div class="w-16 h-16 bg-sky-500/20 text-sky-400 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+                <i class="fa-brands fa-telegram"></i>
+            </div>
+            <h2 class="text-2xl font-bold mb-2 text-sky-400">Verifikasi Keanggotaan</h2>
+            <p class="text-sm text-slate-300 mb-5">Anda wajib bergabung di grup/channel resmi kami sebelum mengakses panel kontrol.</p>
+
+    <!-- Direct Link ke Telegram Channel Baru -->
+    <a href="https://t.me/inpormationpikri" target="_blank" class="w-full mb-4 inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 border border-sky-500/50 text-sky-400 font-semibold py-3 rounded-xl transition shadow-md">
+        <i class="fa-solid fa-paper-plane"></i> Gabung @inpormationpikri
+    </a>
+            <div class="relative flex py-2 items-center mb-3">
+                <div class="flex-grow border-t border-slate-800"></div>
+                <span class="flex-shrink mx-4 text-slate-500 text-xs uppercase font-semibold">Sudah Join?</span>
+                <div class="flex-grow border-t border-slate-800"></div>
+            </div>
+
+            <!-- Input Telegram ID -->
+            <input type="text" id="telegramIdInput" placeholder="Masukkan ID Telegram Anda (Contoh: 123456789)" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 mb-4 text-center text-slate-100 focus:outline-none focus:border-sky-500 font-mono text-sm">
+            
+            <button id="verifyBtn" onclick="verifyUser()" class="w-full bg-gradient-to-r from-blue-600 to-sky-500 hover:from-blue-500 hover:to-sky-400 text-white font-semibold py-3 rounded-xl transition shadow-lg shadow-sky-500/30">
+                Verifikasi & Masuk
+            </button>
+            <p id="verifyError" class="text-red-400 text-xs mt-3 hidden font-medium"></p>
+        </div>
+    </div>
+
+    <!-- MAIN PANEL KONTROL -->
+    <div id="mainPanel" class="w-full max-w-6xl glass rounded-3xl glow-blue p-6 md:p-8 hidden">
+        <!-- Header Panel -->
+        <div class="flex flex-col md:flex-row justify-between items-center border-b border-slate-800 pb-6 mb-6 gap-4">
+            <div>
+                <h1 class="text-2xl font-bold bg-gradient-to-r from-sky-400 to-blue-500 bg-clip-text text-transparent">
+                    <i class="fa-solid fa-robot mr-2"></i> Telegram Bot Master Control
+                </h1>
+                <p class="text-xs text-slate-400 mt-1">Status: <span id="connectionStatus" class="text-amber-400">Belum Terhubung</span></p>
+            </div>
+            <!-- Input Token Bot Target -->
+            <div class="flex items-center gap-2 w-full md:w-auto">
+                <input type="password" id="targetBotToken" placeholder="Token Bot yang dikontrol..." class="bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-sm text-slate-200 focus:outline-none focus:border-sky-500 w-full md:w-72">
+                <button onclick="connectBot()" class="bg-sky-600 hover:bg-sky-500 text-white px-4 py-2 rounded-xl text-sm font-semibold transition shrink-0">Hubungkan</button>
+            </div>
+        </div>
+
+        <!-- Grid Fitur Panel -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            
+            <!-- 1. Ganti Nama Bot -->
+            <div class="bg-slate-900/60 border border-slate-800 p-5 rounded-2xl flex flex-col justify-between">
+                <div>
+                    <h3 class="font-semibold text-sky-400 mb-2"><i class="fa-solid fa-signature mr-2"></i> Ganti Nama Bot</h3>
+                    <input type="text" id="newName" placeholder="Nama Baru Bot..." class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm mb-3 focus:outline-none focus:border-sky-500">
+                </div>
+                <button onclick="executeAction('changeName')" class="w-full bg-blue-600/30 hover:bg-blue-600/50 border border-blue-500/40 text-sky-300 py-2 rounded-lg text-sm font-medium transition">Ubah Nama</button>
+            </div>
+
+            <!-- 2. Ganti Deskripsi / Bio Bot -->
+            <div class="bg-slate-900/60 border border-slate-800 p-5 rounded-2xl flex flex-col justify-between">
+                <div>
+                    <h3 class="font-semibold text-sky-400 mb-2"><i class="fa-solid fa-align-left mr-2"></i> Ganti Deskripsi / Bio</h3>
+                    <textarea id="newBio" rows="2" placeholder="Deskripsi/Bio baru..." class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm mb-3 focus:outline-none focus:border-sky-500 resize-none"></textarea>
+                </div>
+                <button onclick="executeAction('changeBio')" class="w-full bg-blue-600/30 hover:bg-blue-600/50 border border-blue-500/40 text-sky-300 py-2 rounded-lg text-sm font-medium transition">Ubah Bio</button>
+            </div>
+
+            <!-- 3. Ganti PP Bot via File / URL -->
+            <div class="bg-slate-900/60 border border-slate-800 p-5 rounded-2xl flex flex-col justify-between">
+                <div>
+                    <h3 class="font-semibold text-sky-400 mb-2"><i class="fa-solid fa-image mr-2"></i> Ganti PP Bot</h3>
+                    <input type="text" id="ppUrl" placeholder="URL Gambar Foto Profil" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm mb-2 focus:outline-none focus:border-sky-500">
+                    <input type="file" id="ppFile" accept="image/*" class="w-full text-xs text-slate-400 mb-3 file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-sky-500/20 file:text-sky-400">
+                </div>
+                <button onclick="executeAction('changePP')" class="w-full bg-blue-600/30 hover:bg-blue-600/50 border border-blue-500/40 text-sky-300 py-2 rounded-lg text-sm font-medium transition">Update PP Bot</button>
+            </div>
+
+            <!-- 4. Ganti PP Channel / Group -->
+            <div class="bg-slate-900/60 border border-slate-800 p-5 rounded-2xl flex flex-col justify-between">
+                <div>
+                    <h3 class="font-semibold text-sky-400 mb-2"><i class="fa-solid fa-users-rectangle mr-2"></i> Ganti PP Channel/Grup</h3>
+                    <input type="text" id="targetChatPpId" placeholder="ID Channel/Grup (cth: -100xxx)" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm mb-2 focus:outline-none focus:border-sky-500">
+                    <input type="text" id="chatPpUrl" placeholder="URL Gambar PP Baru" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm mb-3 focus:outline-none focus:border-sky-500">
+                </div>
+                <button onclick="executeAction('changeChatPP')" class="w-full bg-blue-600/30 hover:bg-blue-600/50 border border-blue-500/40 text-sky-300 py-2 rounded-lg text-sm font-medium transition">Ubah PP Grup/Channel</button>
+            </div>
+
+            <!-- 5. Broadcast Pesan (Text & Gambar) -->
+            <div class="bg-slate-900/60 border border-slate-800 p-5 rounded-2xl flex flex-col justify-between">
+                <div>
+                    <h3 class="font-semibold text-sky-400 mb-2"><i class="fa-solid fa-bullhorn mr-2"></i> Broadcast Pesan</h3>
+                    <input type="text" id="bcTarget" placeholder="Target ID (User/Grup/Channel)" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm mb-2 focus:outline-none focus:border-sky-500">
+                    <textarea id="bcText" rows="2" placeholder="Isi pesan text / caption..." class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm mb-2 focus:outline-none focus:border-sky-500 resize-none"></textarea>
+                    <input type="text" id="bcImgUrl" placeholder="URL Gambar (Opsional)" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm mb-3 focus:outline-none focus:border-sky-500">
+                </div>
+                <button onclick="executeAction('broadcast')" class="w-full bg-blue-600/30 hover:bg-blue-600/50 border border-blue-500/40 text-sky-300 py-2 rounded-lg text-sm font-medium transition">Kirim Broadcast</button>
+            </div>
+
+            <!-- 6. Info Group / User / Channel List (Auto Detect) -->
+            <div class="bg-slate-900/60 border border-slate-800 p-5 rounded-2xl flex flex-col justify-between">
+                <div>
+                    <h3 class="font-semibold text-sky-400 mb-2"><i class="fa-solid fa-satellite-dish mr-2"></i> Auto Detect Chat & ID</h3>
+                    <div id="idListDisplay" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-slate-300 h-28 overflow-y-auto console-text mb-3">
+                        [Hubungkan bot untuk memindai otomatis grup/channel terdaftar...]
+                    </div>
+                </div>
+                <button onclick="autoDetectChats()" class="w-full bg-blue-600/30 hover:bg-blue-600/50 border border-blue-500/40 text-sky-300 py-2 rounded-lg text-sm font-medium transition">Pindai Ulang Chat</button>
+            </div>
+
+        </div>
+
+        <!-- Konsol Log Aktivitas -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
+            <div class="flex justify-between items-center mb-3">
+                <span class="text-sm font-semibold text-sky-400"><i class="fa-solid fa-terminal mr-2"></i> Konsol Log Aktivitas</span>
+                <button onclick="clearConsole()" class="text-xs text-slate-400 hover:text-slate-200">Bersihkan Log</button>
+            </div>
+            <div id="consoleLog" class="bg-slate-950 rounded-xl p-3 h-36 overflow-y-auto console-text text-xs text-emerald-400 space-y-1">
+                <div>[SYSTEM] Panel kontrol siap. Masukkan ID Telegram untuk verifikasi...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Logika Frontend -->
+    <script>
+        function logToConsole(message, type = 'info') {
+            const consoleBox = document.getElementById('consoleLog');
+            const time = new Date().toLocaleTimeString();
+            let colorClass = "text-emerald-400";
+            if(type === 'error') colorClass = "text-red-400";
+            if(type === 'warn') colorClass = "text-amber-400";
+            
+            consoleBox.innerHTML += `<div class="${colorClass}">[${time}] ${message}</div>`;
+            consoleBox.scrollTop = consoleBox.scrollHeight;
+        }
+
+        // Verifikasi User via Backend Serverless Vercel
+        async function verifyUser() {
+            const tgId = document.getElementById('telegramIdInput').value.trim();
+            const errorEl = document.getElementById('verifyError');
+            const verifyBtn = document.getElementById('verifyBtn');
+
+            if (!tgId || isNaN(tgId)) {
+                errorEl.textContent = "Masukkan ID Telegram yang valid!";
+                errorEl.classList.remove('hidden');
+                return;
+            }
+
+            errorEl.classList.add('hidden');
+            verifyBtn.textContent = "Memeriksa keanggotaan...";
+            verifyBtn.disabled = true;
+            logToConsole(`Mengirim permintaan verifikasi untuk ID: ${tgId}...`);
+
+            try {
+                const response = await fetch('/api/verify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ telegramId: tgId })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    logToConsole(`Verifikasi SUKSES! Status keanggotaan: ${result.status}`);
+                    document.getElementById('verifyModal').classList.add('hidden');
+                    document.getElementById('mainPanel').classList.remove('hidden');
+                } else {
+                    errorEl.textContent = result.message || "Akses Ditolak! Anda belum bergabung di @infobotpikri.";
+                    errorEl.classList.remove('hidden');
+                    logToConsole(`Verifikasi DITOLAK: ${result.message}`, "error");
+                    verifyBtn.textContent = "Verifikasi & Masuk";
+                    verifyBtn.disabled = false;
+                }
+            } catch (err) {
+                errorEl.textContent = "Gagal terhubung ke server verifikasi.";
+                errorEl.classList.remove('hidden');
+                logToConsole("Error koneksi ke backend verifikasi.", "error");
+                verifyBtn.textContent = "Verifikasi & Masuk";
+                verifyBtn.disabled = false;
+            }
+        }
+
+        // Hubungkan Bot Target
+        async function connectBot() {
+            const token = document.getElementById('targetBotToken').value.trim();
+            if(!token) {
+                alert("Masukkan token bot target!");
+                return;
+            }
+
+            logToConsole("Menghubungkan ke bot target...");
+            try {
+                const res = await fetch(`https://api.telegram.org/bot${token}/getMe`);
+                const data = await res.json();
+
+                if(data.ok) {
+                    document.getElementById('connectionStatus').textContent = `Terhubung: @${data.result.username}`;
+                    document.getElementById('connectionStatus').className = "text-emerald-400 font-semibold";
+                    logToConsole(`Bot target terhubung: ${data.result.first_name} (@${data.result.username})`);
+                    autoDetectChats();
+                } else {
+                    alert("Token Bot Target tidak valid!");
+                    logToConsole("Token bot target salah.", "error");
+                }
+            } catch (e) {
+                logToConsole("Gagal menghubungkan bot target.", "error");
+            }
+        }
+
+        // Auto Detect Grup & Channel Terdaftar
+        async function autoDetectChats() {
+            const token = document.getElementById('targetBotToken').value.trim();
+            const display = document.getElementById('idListDisplay');
+
+            if(!token) {
+                display.innerHTML = "[Masukkan token bot target dahulu...]";
+                return;
+            }
+
+            display.innerHTML = "Memindai daftar chat/grup...";
+            logToConsole("Memulai deteksi otomatis grup & channel...");
+
+            try {
+                const res = await fetch(`https://api.telegram.org/bot${token}/getUpdates`);
+                const data = await res.json();
+
+                if (data.ok && data.result) {
+                    const chatsMap = new Map();
+
+                    data.result.forEach(update => {
+                        let chat = update.message?.chat || update.my_chat_member?.chat || update.channel_post?.chat;
+                        if(chat) {
+                            chatsMap.set(chat.id, {
+                                title: chat.title || chat.username || chat.first_name || "Private Chat",
+                                type: chat.type,
+                                id: chat.id
+                            });
+                        }
+                    });
+
+                    if(chatsMap.size > 0) {
+                        let html = "";
+                        chatsMap.forEach(c => {
+                            html += `• <b>${c.title}</b> [${c.type}]<br>&nbsp;&nbsp;ID: <code>${c.id}</code><br>`;
+                        });
+                        display.innerHTML = html;
+                        logToConsole(`Ditemukan ${chatsMap.size} chat/grup otomatis.`);
+                    } else {
+                        display.innerHTML = "Belum ada riwayat update chat baru yang ditemukan.";
+                        logToConsole("Tidak ada riwayat update baru.", "warn");
+                    }
+                }
+            } catch (err) {
+                display.innerHTML = "Gagal memindai chat terdaftar.";
+                logToConsole("Gagal menjalankan Auto Detect.", "error");
+            }
+        }
+
+        // Helper untuk Mengambil Gambar dari URL dan Mengubahnya ke Blob (Bypass CORS)
+        async function fetchImageBlob(url) {
+            try {
+                const res = await fetch(url);
+                if (!res.ok) throw new Error("Gagal mengunduh gambar dari URL.");
+                return await res.blob();
+            } catch (e) {
+                // Fallback menggunakan Proxy jika URL terkena proteksi CORS
+                const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+                const res = await fetch(proxyUrl);
+                return await res.blob();
+            }
+        }
+
+        // Eksekusi Fitur Kontrol Bot
+        async function executeAction(actionType) {
+            const token = document.getElementById('targetBotToken').value.trim();
+            if (!token) {
+                alert("Harap hubungkan token bot target terlebih dahulu!");
+                return;
+            }
+
+            try {
+                switch (actionType) {
+                    case 'changeName': {
+                        const name = document.getElementById('newName').value.trim();
+                        if (!name) return alert("Masukkan nama baru!");
+                        
+                        logToConsole(`Mengubah nama bot menjadi: "${name}"...`);
+                        const res = await fetch(`https://api.telegram.org/bot${token}/setMyName`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ name: name })
+                        });
+                        const data = await res.json();
+                        if (data.ok) logToConsole("Nama bot berhasil diperbarui!");
+                        else logToConsole(`Gagal ubah nama: ${data.description}`, "error");
+                        break;
+                    }
+
+                    case 'changeBio': {
+                        const bio = document.getElementById('newBio').value.trim();
+                        if (!bio) return alert("Masukkan deskripsi/bio baru!");
+
+                        logToConsole("Mengubah deskripsi & bio bot...");
+                        const resDesc = await fetch(`https://api.telegram.org/bot${token}/setMyDescription`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ description: bio })
+                        });
+                        const resShort = await fetch(`https://api.telegram.org/bot${token}/setMyShortDescription`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ short_description: bio })
+                        });
+
+                        const dataDesc = await resDesc.json();
+                        if (dataDesc.ok) logToConsole("Deskripsi/Bio bot berhasil diperbarui!");
+                        else logToConsole(`Gagal ubah bio: ${dataDesc.description}`, "error");
+                        break;
+                    }
+
+                    case 'changePP': {
+                        const url = document.getElementById('ppUrl').value.trim();
+                        if (!url) return alert("Masukkan URL Gambar Foto Profil!");
+
+                        logToConsole("Mengirim permintaan update PP Bot ke server...");
+
+                        const res = await fetch('/api/photo', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                token: token,
+                                type: 'bot',
+                                imageUrl: url
+                            })
+                        });
+
+                        const data = await res.json();
+                        if (data.success) {
+                            logToConsole("Foto profil bot berhasil diganti!");
+                        } else {
+                            logToConsole(`Gagal ganti PP bot: ${data.message}`, "error");
+                        }
+                        break;
+                    }
+
+                    case 'changeChatPP': {
+                        const chatId = document.getElementById('targetChatPpId').value.trim();
+                        const chatPpUrl = document.getElementById('chatPpUrl').value.trim();
+
+                        if (!chatId || !chatPpUrl) return alert("Isi ID Grup/Channel dan URL Gambar!");
+
+                        logToConsole(`Mengubah PP Grup/Channel (${chatId})...`);
+
+                        const res = await fetch('/api/photo', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                token: token,
+                                type: 'chat',
+                                chatId: chatId,
+                                imageUrl: chatPpUrl
+                            })
+                        });
+
+                        const data = await res.json();
+                        if (data.success) {
+                            logToConsole("PP Grup/Channel berhasil diganti!");
+                        } else {
+                            logToConsole(`Gagal ganti PP Grup: ${data.message}`, "error");
+                        }
+                        break;
+                    }
+
+                    case 'broadcast': {
+                        const target = document.getElementById('bcTarget').value.trim();
+                        const text = document.getElementById('bcText').value.trim();
+                        const imgUrl = document.getElementById('bcImgUrl').value.trim();
+
+                        if (!target || !text) return alert("Masukkan Target ID dan Pesan!");
+
+                        logToConsole(`Kirim broadcast ke ${target}...`);
+
+                        let endpoint = `https://api.telegram.org/bot${token}/sendMessage`;
+                        let payload = { chat_id: target, text: text, parse_mode: 'HTML' };
+
+                        if (imgUrl) {
+                            endpoint = `https://api.telegram.org/bot${token}/sendPhoto`;
+                            payload = { chat_id: target, photo: imgUrl, caption: text, parse_mode: 'HTML' };
+                        }
+
+                        const res = await fetch(endpoint, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+                        const data = await res.json();
+
+                        if (data.ok) logToConsole("Pesan broadcast berhasil terkirim!");
+                        else logToConsole(`Broadcast gagal: ${data.description}`, "error");
+                        break;
+                    }
+                }
+            } catch (err) {
+                logToConsole(`Error Eksekusi: ${err.message}`, "error");
+            }
+        }
+
+        function clearConsole() {
+            document.getElementById('consoleLog').innerHTML = `<div>[SYSTEM] Konsol dibersihkan.</div>`;
+        }
+    </script>
+</body>
+</html>
